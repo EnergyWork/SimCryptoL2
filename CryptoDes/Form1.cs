@@ -326,7 +326,9 @@ namespace CryptoDes
             file = openFileDialog1.FileName;
             labelFile.Text = "Файл: " + file;
             if (openFileDialog1.FilterIndex == 1)
+            {
                 fileType = FileType.txt;
+            }           
             else
             {
                 fileType = FileType.img;

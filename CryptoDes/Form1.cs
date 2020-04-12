@@ -271,6 +271,9 @@ namespace CryptoDes
                     imageOut = BytesToImage(encryptionBytes, imageIn.Size);
                     imageOut.Save(NewFileName(file, 0));
                 }
+                labelLog.ForeColor = Color.Green;
+                labelLog.Text = "Зашифровано!";
+                StartTimer();
             }
         }
         private void bDecrypted_Click(object sender, EventArgs e)
@@ -293,6 +296,9 @@ namespace CryptoDes
                     imageOut = BytesToImage(decryptionBytes, imageIn.Size);
                     imageOut.Save(NewFileName(file, 1));
                 }
+                labelLog.ForeColor = Color.Green;
+                labelLog.Text = "Дешифровано!";
+                StartTimer();
             }
         }
         private void timerLogClear_Tick(object sender, EventArgs e)
@@ -302,6 +308,7 @@ namespace CryptoDes
             else
             {
                 labelLog.Text = "";
+                labelLog.ForeColor = Color.Black;
                 timerLogClear.Enabled = false;
             }
         }

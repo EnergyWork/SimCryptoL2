@@ -197,6 +197,8 @@ namespace CryptoDes
                 0,
                 cryptoProvider.IV.Length
                 );
+
+            //tbKey.Text = (cryptoProvider.Key).ToString("x2");
         }
         private string NewFileName(string file, int type)
         {

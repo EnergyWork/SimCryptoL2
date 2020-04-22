@@ -343,6 +343,7 @@
             this.Controls.Add(this.labelConnectBlockAlg);
             this.Controls.Add(this.labelAlgType);
             this.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "MainForm";
             this.Text = "DES AES шифрование";
             this.Load += new System.EventHandler(this.MainForm_Load);

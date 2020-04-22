@@ -361,6 +361,7 @@ namespace CryptoDes
 
         private void button1_Click(object sender, EventArgs e)
         {
+
             pbImage.Visible = false;
             richTextBox1.Visible = true;
             richTextBox1.Text = "";

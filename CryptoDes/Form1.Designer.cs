@@ -50,6 +50,12 @@
             this.labelLog = new System.Windows.Forms.Label();
             this.timerLogClear = new System.Windows.Forms.Timer(this.components);
             this.bSaveKeyIV = new System.Windows.Forms.Button();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.lInput = new System.Windows.Forms.Label();
+            this.bSaveFile = new System.Windows.Forms.Button();
+            this.pbImage = new System.Windows.Forms.PictureBox();
+            this.button1 = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.pbImage)).BeginInit();
             this.SuspendLayout();
             // 
             // labelAlgType
@@ -141,12 +147,14 @@
             // 
             // bOpenFile
             // 
+            this.bOpenFile.FlatAppearance.BorderSize = 2;
+            this.bOpenFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bOpenFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F);
-            this.bOpenFile.Location = new System.Drawing.Point(15, 102);
+            this.bOpenFile.Location = new System.Drawing.Point(15, 100);
             this.bOpenFile.Name = "bOpenFile";
-            this.bOpenFile.Size = new System.Drawing.Size(202, 64);
+            this.bOpenFile.Size = new System.Drawing.Size(202, 37);
             this.bOpenFile.TabIndex = 28;
-            this.bOpenFile.Text = "Открыть файл";
+            this.bOpenFile.Text = "Открыть";
             this.bOpenFile.UseVisualStyleBackColor = true;
             this.bOpenFile.Click += new System.EventHandler(this.bOpenFile_Click);
             // 
@@ -207,6 +215,10 @@
             this.openFileDialog1.FileName = "openFileDialog1";
             this.openFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
             // 
+            // saveFileDialog1
+            // 
+            this.saveFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog1_FileOk);
+            // 
             // labelKey
             // 
             this.labelKey.AutoSize = true;
@@ -249,11 +261,69 @@
             this.bSaveKeyIV.UseVisualStyleBackColor = true;
             this.bSaveKeyIV.Click += new System.EventHandler(this.bSaveKeyIV_Click);
             // 
+            // richTextBox1
+            // 
+            this.richTextBox1.Location = new System.Drawing.Point(15, 294);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.Size = new System.Drawing.Size(422, 208);
+            this.richTextBox1.TabIndex = 37;
+            this.richTextBox1.Text = "";
+            // 
+            // lInput
+            // 
+            this.lInput.AutoSize = true;
+            this.lInput.Location = new System.Drawing.Point(12, 277);
+            this.lInput.Name = "lInput";
+            this.lInput.Size = new System.Drawing.Size(87, 13);
+            this.lInput.TabIndex = 38;
+            this.lInput.Text = "Поле для ввода";
+            // 
+            // bSaveFile
+            // 
+            this.bSaveFile.FlatAppearance.BorderSize = 2;
+            this.bSaveFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bSaveFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F);
+            this.bSaveFile.Location = new System.Drawing.Point(15, 139);
+            this.bSaveFile.Name = "bSaveFile";
+            this.bSaveFile.Size = new System.Drawing.Size(202, 37);
+            this.bSaveFile.TabIndex = 39;
+            this.bSaveFile.Text = "Сохранить";
+            this.bSaveFile.UseVisualStyleBackColor = true;
+            this.bSaveFile.Click += new System.EventHandler(this.bSaveFile_Click);
+            // 
+            // pbImage
+            // 
+            this.pbImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pbImage.Location = new System.Drawing.Point(342, 467);
+            this.pbImage.Name = "pbImage";
+            this.pbImage.Size = new System.Drawing.Size(100, 50);
+            this.pbImage.TabIndex = 40;
+            this.pbImage.TabStop = false;
+            this.pbImage.Visible = false;
+            // 
+            // button1
+            // 
+            this.button1.FlatAppearance.BorderSize = 0;
+            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
+            this.button1.Location = new System.Drawing.Point(110, 272);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(122, 21);
+            this.button1.TabIndex = 41;
+            this.button1.Text = "Очистить поле ввода";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(454, 310);
+            this.ClientSize = new System.Drawing.Size(454, 529);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.pbImage);
+            this.Controls.Add(this.bSaveFile);
+            this.Controls.Add(this.lInput);
+            this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.bSaveKeyIV);
             this.Controls.Add(this.labelLog);
             this.Controls.Add(this.labelIV);
@@ -272,8 +342,11 @@
             this.Controls.Add(this.labelConnectBlockType);
             this.Controls.Add(this.labelConnectBlockAlg);
             this.Controls.Add(this.labelAlgType);
+            this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Name = "MainForm";
             this.Text = "DES AES шифрование";
+            this.Load += new System.EventHandler(this.MainForm_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.pbImage)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -302,6 +375,11 @@
         private System.Windows.Forms.Label labelLog;
         private System.Windows.Forms.Timer timerLogClear;
         private System.Windows.Forms.Button bSaveKeyIV;
+        private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.Label lInput;
+        private System.Windows.Forms.Button bSaveFile;
+        private System.Windows.Forms.PictureBox pbImage;
+        private System.Windows.Forms.Button button1;
     }
 }
 

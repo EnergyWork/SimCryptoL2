@@ -26,6 +26,7 @@ namespace CryptoDes
         Image imageIn, imageOut;
         ICipher cryptoProvider;
         uint fiveSecond;
+        string saveFileName;
 
         private CipherMode CurrentMode()
         {
@@ -67,29 +68,36 @@ namespace CryptoDes
         }
         private bool Check()
         {
-            if (file != string.Empty)
+            if (!string.IsNullOrEmpty(file))
             {
-                if (tbKey.Text != string.Empty)
+                if (!string.IsNullOrEmpty(tbKey.Text))
                 {
-                    if (tbIV.Text != string.Empty)
+                    if (!string.IsNullOrEmpty(tbIV.Text))
                     {
                         return true;
                     }
                     else
                     {
+                        labelLog.ForeColor = Color.Red;
                         labelLog.Text = "Вектор инициализации не инициализирован!";
                         StartTimer();
                     }
                 }
                 else
                 {
+                    labelLog.ForeColor = Color.Red;
                     labelLog.Text = "Ключ не инициализирован!";
                     StartTimer();
                 }
             }
+            else if (!string.IsNullOrEmpty(richTextBox1.Text))
+            {
+                return true;
+            }
             else
             {
-                labelLog.Text = "Файл не выбран!";
+                labelLog.ForeColor = Color.Red;
+                labelLog.Text = "Нет данных для шифрованя/дешифрования!";
                 StartTimer();
             }
             return false;
@@ -120,16 +128,16 @@ namespace CryptoDes
                     cryptoProvider = new DEScipher(
                         CurrentMode(),
                         CurrentPaddingMode(),
-                        Encoding.UTF8.GetBytes(tbKey.Text),
-                        Encoding.UTF8.GetBytes(tbIV.Text)
+                        Convert.FromBase64String(tbKey.Text), //Encoding.Unicode.GetBytes(tbKey.Text),
+                        Convert.FromBase64String(tbIV.Text)
                         );
                     break;
                 case 1:
                     cryptoProvider = new AEScipher(
                         CurrentMode(),
                         CurrentPaddingMode(),
-                        Encoding.UTF8.GetBytes(tbKey.Text),
-                        Encoding.UTF8.GetBytes(tbIV.Text)
+                        Convert.FromBase64String(tbKey.Text),
+                        Convert.FromBase64String(tbIV.Text)
                         );
                     break;
             }
@@ -139,7 +147,7 @@ namespace CryptoDes
             Bitmap bmp = new Bitmap(
                 size.Width,
                 size.Height,
-                PixelFormat.Format32bppRgb
+                PixelFormat.Format32bppArgb
                 );
             BitmapData bmpData = bmp.LockBits(
                 new Rectangle(0, 0, bmp.Width, bmp.Height),
@@ -149,14 +157,6 @@ namespace CryptoDes
             System.Runtime.InteropServices.Marshal.Copy(bytes, 0, bmpData.Scan0, bytes.Length);
             bmp.UnlockBits(bmpData);
             return bmp;
-            //Bitmap result = new Bitmap(size.Width, size.Height);
-
-            //int index = 0;
-            //for (int x = 0; x < size.Width; x++) 
-            //    for (int y = 0; y < size.Height; y++, index += 3)
-            //        result.SetPixel(x, y, Color.FromArgb(bytes[index + 0], bytes[index + 1], bytes[index + 2]));
-
-            //return result;
         }
         private byte[] ImageToBytes(Bitmap bmp)
         {
@@ -172,59 +172,51 @@ namespace CryptoDes
             System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
             bmp.UnlockBits(bmpData);
             return rgbValues;
-            //byte[] bytes = new byte[3 * bmp.Width * bmp.Height];
-            //int index = 0;
-            //for (int x = 0; x < bmp.Width; x++) 
-            //    for (int y = 0; y < bmp.Height; y++, index += 3)
-            //    {
-            //        Color curPixel = bmp.GetPixel(x, y);
-            //        bytes[index + 0] = curPixel.R;
-            //        bytes[index + 1] = curPixel.G;
-            //        bytes[index + 2] = curPixel.B;
-            //    }
-
-            //return bytes;
         }
         private void UpdateKeyIV()
         {
-            tbKey.Text = Encoding.ASCII.GetString(
-               cryptoProvider.Key,
-               0,
-               cryptoProvider.Key.Length
-               );
-            tbIV.Text = Encoding.ASCII.GetString(
-                cryptoProvider.IV,
-                0,
-                cryptoProvider.IV.Length
-                );
+            tbKey.Text = Convert.ToBase64String(cryptoProvider.Key);//Encoding.Unicode.GetString(cryptoProvider.Key, 0, cryptoProvider.Key.Length);
+            tbIV.Text = Convert.ToBase64String(cryptoProvider.IV);//Encoding.Unicode.GetString(cryptoProvider.IV, 0, cryptoProvider.IV.Length);
 
             //tbKey.Text = (cryptoProvider.Key).ToString("x2");
         }
         private string NewFileName(string file, int type)
         {
-            //C:\path\filename.txt => C:\path\filenameENCRYPTED.txt
-            string tmp = file;
-            string file1 = tmp.Substring(0, tmp.LastIndexOf('.'));
-            string format = tmp.Substring(file1.Length);
+            //C:\path\filename.txt => C:\path\filenameENC.txt
+            string tmp, file1, format;
+            if (!string.IsNullOrEmpty(file))
+            {
+                tmp = file;
+                file1 = tmp.Substring(0, tmp.LastIndexOf('.'));
+                format = tmp.Substring(file1.Length);
+            }
+            else
+            {
+                file1 = ".\\File";
+                format = fileType == FileType.txt ? ".txt" : ".png";
+            }
             switch(type)
             {
-                case 0: return file1 + "ENC" + format;
-                case 1: return file1 + "DEC" + format;
+                case 0: return file1 + "Enc" + format;
+                case 1: return file1 + "Dec" + format;
             }
             return file;
         }
-        public MainForm()
+        public MainForm() // 470x349
         {
             InitializeComponent();
             file = string.Empty;
-            fileType = FileType.none;
+            saveFileName = string.Empty;
+            fileType = FileType.txt;
             fiveSecond = 0;
             cbCipherAlg.SelectedIndex = 0;
             cbConnectBlockAlg.SelectedIndex = 0;
             cbConnectBlockType.SelectedIndex = 0;
+            tbKey.ScrollBars = ScrollBars.Horizontal;
+            tbIV.ScrollBars = ScrollBars.Horizontal;
             bOpenFile.Select();
-            //CreateCryptoProviderRandom();
-            //UpdateKeyIV();
+            labelLog.Location = new Point(labelLog.Location.X, 509);
+            pbImage.SizeMode = PictureBoxSizeMode.Zoom;
         }
 
         private void bKey_Click(object sender, EventArgs e)
@@ -232,46 +224,44 @@ namespace CryptoDes
             CreateCryptoProviderRandom();
             UpdateKeyIV();
         }
-
         private void bIV_Click(object sender, EventArgs e)
         {
             CreateCryptoProvider();
             UpdateKeyIV();
-            labelLog.Text = "Инициализировано";
+            labelLog.Text = "Инициализировано!";
             StartTimer();
         }
-
         private void cbConnectBlockAlg_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //CreateCryptoProviderRandom();
-            //UpdateKeyIV();
-        }
 
+        }
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
 
         }
-
         private void bEncrypted_Click(object sender, EventArgs e)
         {
             if (Check())
             {
                 CreateCryptoProvider();
+                 //= NewFileName(file, 0);
                 if (fileType == FileType.txt)
                 {
-                    //string text = File.ReadAllText(file, Encoding.ASCII);
-                    //byte[] bytes = Encoding.UTF8.GetBytes(text);
-                    //byte[] encText = cryptoProvider.Encrypt(bytes);
-                    //string encT = Encoding.ASCII.GetString(encText);
-                    //File.WriteAllText(NewFileName(file, 0), encT);
-                    cryptoProvider.Encrypt(file, NewFileName(file, 0));
+                    string text = richTextBox1.Text;
+                    byte[] bytes = Encoding.Unicode.GetBytes(text); //File.ReadAllBytes(file);
+                    byte[] encText = cryptoProvider.Encrypt(bytes);
+                    string encT = Convert.ToBase64String(encText); //Encoding.Unicode.GetString(encText);
+                    richTextBox1.Text = encT;
+                    //File.WriteAllText(saveFileName, encT, Encoding.Unicode);
+                    //cryptoProvider.Encrypt(file, NewFileName(file, 0));
                 }
                 else
                 {
                     byte[] bytes = ImageToBytes(imageIn as Bitmap);
                     byte[] encryptionBytes = cryptoProvider.Encrypt(bytes);
                     imageOut = BytesToImage(encryptionBytes, imageIn.Size);
-                    imageOut.Save(NewFileName(file, 0));
+                    pbImage.Image = imageOut;
+                    //imageOut.Save(saveFileName);
                 }
                 labelLog.ForeColor = Color.Green;
                 labelLog.Text = "Зашифровано!";
@@ -282,21 +272,24 @@ namespace CryptoDes
         {
             if (Check())
             {
+                string saveFileName = NewFileName(file, 1);
                 if (fileType == FileType.txt)
                 {
-                    //string text = File.ReadAllText(file, Encoding.ASCII);
-                    //byte[] bytes = Encoding.UTF8.GetBytes(text);
-                    //byte[] decText = cryptoProvider.Decrypt(bytes);
-                    //string decT = Encoding.ASCII.GetString(decText);
-                    //File.WriteAllText(NewFileName(file, 1), decT);
-                    cryptoProvider.Decrypt(file, NewFileName(file, 1));
+                    //string text = File.ReadAllText(file);
+                    byte[] bytes = Convert.FromBase64String(richTextBox1.Text); //File.ReadAllBytes(file);
+                    byte[] decText = cryptoProvider.Decrypt(bytes);
+                    string decT = Encoding.Unicode.GetString(decText);
+                    richTextBox1.Text = decT;
+                    //File.WriteAllText(saveFileName, decT, Encoding.Unicode);
+                    //cryptoProvider.Decrypt(file, NewFileName(file, 1));
                 }
                 else
                 {
                     byte[] bytes = ImageToBytes(imageIn as Bitmap);
                     byte[] decryptionBytes = cryptoProvider.Decrypt(bytes);
                     imageOut = BytesToImage(decryptionBytes, imageIn.Size);
-                    imageOut.Save(NewFileName(file, 1));
+                    pbImage.Image = imageOut;
+                    //imageOut.Save(saveFileName);
                 }
                 labelLog.ForeColor = Color.Green;
                 labelLog.Text = "Дешифровано!";
@@ -305,7 +298,7 @@ namespace CryptoDes
         }
         private void timerLogClear_Tick(object sender, EventArgs e)
         {
-            if (fiveSecond < 5)
+            if (fiveSecond < 8)
                 fiveSecond++;
             else
             {
@@ -323,7 +316,56 @@ namespace CryptoDes
 
         private void bSaveKeyIV_Click(object sender, EventArgs e)
         {
+            saveFileDialog1.Filter = "Text file (*.txt)|*.txt";
+            saveFileDialog1.Title = "Сохранить ключ и вектор инициализации";
+            if (saveFileDialog1.ShowDialog() == DialogResult.Cancel)
+                return;
+            string saveKeyFile = saveFileDialog1.FileName;
+            File.WriteAllText(saveKeyFile, "Key: " + tbKey.Text + "\nIV: " + tbIV.Text);
+            labelLog.Text = "Сохранено в \"" + saveKeyFile + "\"";
+            StartTimer();
+        }
+        private void saveFileDialog1_FileOk(object sender, CancelEventArgs e)
+        {
 
+        }
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+
+        }
+        private void bSaveFile_Click(object sender, EventArgs e)
+        {
+            saveFileDialog1.Filter =
+            (
+                fileType == FileType.txt
+                ? "Text file (*.txt)|*.txt"
+                : "Image file (*.png, *.jpg, *.bmp)|*.png; *.jpg; *.jpeg; *.bmp;"
+            );
+            saveFileDialog1.Title = "Выберите файл для сохранения";
+            if (saveFileDialog1.ShowDialog() == DialogResult.Cancel)
+                return;
+            string selectFile = saveFileDialog1.FileName;
+            if (fileType == FileType.txt)
+            {
+                File.WriteAllText(selectFile, richTextBox1.Text);
+            }
+            else
+            {
+                pbImage.Image.Save(selectFile);
+            }
+            labelLog.ForeColor = Color.Green;
+            labelLog.Text = "Сохранено в \"" + selectFile + "\"";
+            StartTimer();
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            pbImage.Visible = false;
+            richTextBox1.Visible = true;
+            richTextBox1.Text = "";
+            labelFile.Text = "Файл: не выбран";
+            file = string.Empty;
         }
 
         private void bOpenFile_Click(object sender, EventArgs e)
@@ -337,11 +379,19 @@ namespace CryptoDes
             if (openFileDialog1.FilterIndex == 1)
             {
                 fileType = FileType.txt;
+                richTextBox1.Text = File.ReadAllText(file);
+                richTextBox1.Visible = true;
+                pbImage.Visible = false;
             }           
             else
             {
                 fileType = FileType.img;
-                imageIn = new Bitmap(file); 
+                imageIn = new Bitmap(file);
+                richTextBox1.Visible = false;
+                pbImage.Visible = true;
+                pbImage.Location = richTextBox1.Location;
+                pbImage.Size = richTextBox1.Size;
+                pbImage.Image = imageIn;
             }
         }
     }

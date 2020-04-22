@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Security.Cryptography;
 
 namespace CryptoDes
@@ -58,14 +60,7 @@ namespace CryptoDes
         }
         byte[] ICipher.Encrypt(byte[] data)
         {
-            var des2 = new DESCryptoServiceProvider
-            {
-                Mode = des.Mode,
-                Padding = des.Padding,
-                Key = des.Key,
-                IV = des.IV
-            };
-            return CryptoTransform(des2.CreateEncryptor(), data);   
+            return CryptoTransform(des.CreateEncryptor(des.Key, des.IV), data);   
         }
         void ICipher.Encrypt(string fileIn, string fileOut)
         {
@@ -98,14 +93,7 @@ namespace CryptoDes
         
         byte[] ICipher.Decrypt(byte[] data)
         {
-            var des2 = new DESCryptoServiceProvider
-            {
-                Mode = des.Mode,
-                Padding = des.Padding,
-                Key = des.Key,
-                IV = des.IV
-            };
-            return CryptoTransform(des2.CreateDecryptor(), data);
+            return CryptoTransform(des.CreateDecryptor(des.Key, des.IV), data);
         }
         void ICipher.Decrypt(string fileIn, string fileOut)
         {
